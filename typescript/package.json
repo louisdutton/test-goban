@@ -1,6 +1,5 @@
 {
   "name": "goban-test",
-  "author": "lumapps:louisdutton",
   "type": "module",
   "private": true,
   "main": "goban.ts",

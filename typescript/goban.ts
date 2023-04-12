@@ -1,12 +1,19 @@
-/** Enum representing the Status of a position on a goban */
+/** The status of a cell on the board/goban. */
 const enum Status {
+  /** The cell contains a white stone. */
   White = 1,
+  /** The cell contains a black stone. */
   Black = 2,
+  /** The cell exists on the board but does not contain a stone. */
   Empty = 3,
+  /** The cell does not exist within the boundaries of the board. */
   Out = 4,
 }
 
+/** A character representation of a {@link Status} (excludes `Status.Out`). */
 type StatusRepresentation = "." | "o" | "#";
+
+/** A variable-dimension matrix representation composed of rows of character arrays.  */
 type GobanMatrix = string[];
 
 // prettier-ignore
@@ -21,9 +28,10 @@ export default class Goban {
 
   /**
    * Get the status of a given position
-   *  @argument x: the x coordinate
-   *  @argument y: the x coordinate
-   **/
+   *  @param x - the x coordinate
+   *  @param y - the y coordinate
+   *  @returns the status of the position
+   */
   getStatus(x: number, y: number): Status {
     if (x < 0 || y < 0 || y >= this.goban.length || x >= this.goban[0].length) {
       return Status.Out;
@@ -33,10 +41,11 @@ export default class Goban {
   }
 
   /**
-   *  Returns true if the position is taken.
-   *  @argument x: the x coordinate
-   *  @argument y: the x coordinate
-   **/
+   *  Returns true if the stone at the given position is taken.
+   *  @param x - the x coordinate of the stone
+   *  @param y - the y coordinate of the stone
+   *  @returns whether the target stone, or any of its neighbors, has a liberty.
+   */
   isTaken(x: number, y: number) {
     const checked = new Set<string>();
 
@@ -67,7 +76,7 @@ export default class Goban {
     return !hasLiberty(x, y);
   }
 
-  /** Logs a formatted goban matrix to the console. */
+  /** Logs a formatted {@link GobanMatrix} to the console. */
   prettyPrint() {
     console.log(this.goban.map((row) => [...row].join(" ")).join("\n"));
   }
