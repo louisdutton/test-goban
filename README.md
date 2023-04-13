@@ -2,7 +2,7 @@
 
 Original repo: [lumapps/test-goban](https://github.com/louisdutton/test-goban.git)
 
-I thought it would be an interesting exercise to complete this task in a couple of languages so I've provided a version in Python, TypeScript and C#.
+I thought it would be an interesting exercise to complete this task in a couple of languages so I've provided a version in Python, TypeScript, C# and Rust.
 
 ## Setup
 
@@ -26,6 +26,10 @@ $ pnpm test
 # C#
 $ cd csharp/GobanTest
 $ dotnet test
+
+# Rust
+$ cd rust
+$ cargo test
 ```
 
 ## Technical Test
