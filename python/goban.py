@@ -46,8 +46,9 @@ class Goban(object):
     def is_taken(self, x: int, y: int) -> bool:
         checked = set()
 
-        def check(x: int, y: int) -> bool:
+        def has_liberty(x: int, y: int) -> bool:
             stone = self.get_status(x, y)
+            nextPosition: tuple = None
             neighbors = (
                 (x + 1, y),
                 (x - 1, y),
@@ -65,9 +66,12 @@ class Goban(object):
                 if status == Status.EMPTY:
                     return True
                 if (status == stone):
-                    checked.add(neighbor)
-                    return check(neighbor[0], neighbor[1])
+                    checked.add((x, y))
+                    nextPosition = neighbor
+
+            if nextPosition != None:
+                return has_liberty(nextPosition[0], nextPosition[1])
 
             return False
 
-        return not check(x, y)
+        return not has_liberty(x, y)

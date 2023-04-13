@@ -1,19 +1,11 @@
-/** The status of a cell on the board/goban. */
 const enum Status {
-  /** The cell contains a white stone. */
   White = 1,
-  /** The cell contains a black stone. */
   Black = 2,
-  /** The cell exists on the board but does not contain a stone. */
   Empty = 3,
-  /** The cell does not exist within the boundaries of the board. */
   Out = 4,
 }
 
-/** A character representation of a {@link Status} (excludes `Status.Out`). */
 type StatusRepresentation = "." | "o" | "#";
-
-/** A variable-dimension matrix representation composed of rows of character arrays.  */
 type GobanMatrix = string[];
 
 // prettier-ignore
@@ -24,7 +16,13 @@ const statusDictionary: Record<StatusRepresentation, Status> = {
 };
 
 export default class Goban {
-  constructor(private goban: GobanMatrix) {}
+  goban: GobanMatrix;
+  dimensions: [number, number];
+
+  constructor(goban: GobanMatrix) {
+    this.goban = goban;
+    this.dimensions = [this.goban.length, this.goban[0].length];
+  }
 
   /**
    * Get the status of a given position
@@ -40,44 +38,61 @@ export default class Goban {
     }
   }
 
-  /**
-   *  Returns true if the stone at the given position is taken.
-   *  @param x - the x coordinate of the stone
-   *  @param y - the y coordinate of the stone
-   *  @returns whether the target stone, or any of its neighbors, has a liberty.
-   */
   isTaken(x: number, y: number) {
-    const checked = new Set<string>();
+    const checked = new Set<number>();
+    const nextPosition = [0, 0];
+    const neighbors = [
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+    ];
 
     const hasLiberty = (x: number, y: number) => {
       const stone = this.getStatus(x, y);
-      const neighbors = [
-        [x + 1, y],
-        [x - 1, y],
-        [x, y + 1],
-        [x, y - 1],
-      ];
+      let foundNext = false;
+
+      // up
+      neighbors[3][0] = x;
+      neighbors[3][1] = y - 1;
+
+      // down
+      neighbors[2][0] = x;
+      neighbors[2][1] = y + 1;
+
+      // right
+      neighbors[0][0] = x + 1;
+      neighbors[0][1] = y;
+
+      // left
+      neighbors[1][0] = x - 1;
+      neighbors[1][1] = y;
 
       for (const [nx, ny] of neighbors) {
-        if (checked.has(`${nx},${ny}`)) continue;
+        const index = this.getIndex(nx, ny);
+        if (checked.has(index)) continue;
 
         const status = this.getStatus(nx, ny);
 
         if (status === Status.Empty) return true;
         if (status === stone) {
-          checked.add(`${nx},${ny}`);
-          return hasLiberty(nx, ny);
+          checked.add(index);
+          nextPosition[0] = nx;
+          nextPosition[1] = ny;
+          foundNext = true;
         }
       }
 
-      return false;
+      // prettier-ignore
+      return foundNext
+        ? hasLiberty(nextPosition[0], nextPosition[1])
+        : false;
     };
 
     return !hasLiberty(x, y);
   }
 
-  /** Logs a formatted {@link GobanMatrix} to the console. */
-  prettyPrint() {
-    console.log(this.goban.map((row) => [...row].join(" ")).join("\n"));
+  getIndex(x: number, y: number) {
+    return y * this.dimensions[0] + x;
   }
 }
