@@ -20,6 +20,12 @@ public struct Vec2
         this.x = x;
         this.y = y;
     }
+
+    public void set(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
+    }
 }
 
 public struct Neighbors
@@ -28,14 +34,6 @@ public struct Neighbors
     public Vec2 down;
     public Vec2 left;
     public Vec2 right;
-
-    public Neighbors(int x, int y)
-    {
-        up = new Vec2(x, y - 1);
-        down = new Vec2(x, y + 1);
-        left = new Vec2(x - 1, y);
-        right = new Vec2(x + 1, y);
-    }
 
     public IEnumerator<Vec2> GetEnumerator()
     {
@@ -49,8 +47,8 @@ public struct Neighbors
 
 public class Goban
 {
-    private string[] _goban;
-    private Dictionary<char, Status> _statusDictionary = new Dictionary<char, Status>()
+    string[] _goban;
+    Dictionary<char, Status> _statusDictionary = new Dictionary<char, Status>()
     {
         {'.', Status.Empty},
         {'o', Status.White},
@@ -63,43 +61,46 @@ public class Goban
         this._goban = goban;
     }
 
-    /// <summary>
-    /// Get the status of a given position
-    /// </summary>
-    private Status GetStatus(int x, int y)
+    bool InBounds(int x, int y)
     {
-        if (x >= 0 && y >= 0 && y < _goban.GetLength(0) && x < _goban[0].Length)
-        {
-            return _statusDictionary[_goban[y][x]];
-        }
-        else return Status.Out;
+        return x >= 0 && y >= 0 && y < _goban.GetLength(0) && x < _goban[0].Length;
     }
 
-    /// <summary>
-    /// Returns true if the stone at the given position is taken.
-    /// </summary>
+    Status GetStatus(int x, int y)
+    {
+        return InBounds(x, y)
+            ? _statusDictionary[_goban[y][x]]
+            : Status.Out;
+    }
+
     public bool IsTaken(int x, int y)
     {
-        var _visited = new HashSet<Vec2>(_goban.GetLength(0) * _goban[0].Length);
-        Status stone;
+        int cellCount = _goban.GetLength(0) * _goban[0].Length;
+        HashSet<Vec2> _visited = new HashSet<Vec2>(cellCount);
+        Status originStatus;
+        Status neighborStatus;
         Neighbors neighbors = new Neighbors();
         Vec2 nextPosition = new Vec2();
         bool foundNext = false;
 
-        bool HasLiberty(int _x, int _y)
+        bool HasLiberty(Vec2 origin)
         {
-            stone = GetStatus(_x, _y);
+            originStatus = GetStatus(origin.x, origin.y);
             foundNext = false;
-            neighbors = new Neighbors(_x, _y);
+
+            neighbors.up.set(origin.x, origin.y - 1);
+            neighbors.down.set(origin.x, origin.y + 1);
+            neighbors.left.set(origin.x - 1, origin.y);
+            neighbors.right.set(origin.x + 1, origin.y);
 
             foreach (Vec2 position in neighbors)
             {
                 if (_visited.Contains(position)) continue;
 
-                Status neighborStatus = GetStatus(position.x, position.y);
+                neighborStatus = GetStatus(position.x, position.y);
 
                 if (neighborStatus == Status.Empty) return true;
-                if (neighborStatus == stone)
+                if (neighborStatus == originStatus)
                 {
                     _visited.Add(position);
                     nextPosition = position;
@@ -109,11 +110,11 @@ public class Goban
 
             if (!foundNext) return false;
 
-            return HasLiberty(nextPosition.x, nextPosition.y);
+            return HasLiberty(nextPosition);
 
         };
 
-        return !HasLiberty(x, y);
+        return !HasLiberty(new Vec2(x, y));
     }
 
 }
