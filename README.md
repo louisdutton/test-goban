@@ -1,17 +1,34 @@
-# How to launch the project
+# Goban Test
 
-To start and launch tests:
+Original repo: [lumapps/test-goban](https://github.com/louisdutton/test-goban.git)
 
-```
-$ git clone https://github.com/lumapps/test-goban.git
+I thought it would be an interesting exercise to complete this task in a couple of languages so I've provided a version in Python, TypeScript and C#.
+
+## Setup
+
+```bash
+
+$ git clone https://github.com/louisdutton/test-goban.git
 $ cd test-goban
+
+# python
+$ cd python
 $ python3 -m venv venv
 $ source venv/bin/activate
 $ pip install -r requirements.txt
 $ pytest .
+
+# typescript (replace pnpm for chosen package manager)
+$ cd typescript
+$ pnpm i
+$ pnpm test
+
+# C#
+$ cd csharp/GobanTest
+$ dotnet test
 ```
 
-# Technical Test
+## Technical Test
 
 The theme of this test is the game of go.
 
